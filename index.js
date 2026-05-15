@@ -32,7 +32,7 @@ initReminderJob();
 
 
 // Catch-all: serve Flutter Web index.html for any other requests
-app.get('(.*)', (req, res) => {
+app.get('/:match*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
