@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "691735027883",
+    "project_id": "university-appointments",
+    "storage_bucket": "university-appointments.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:691735027883:android:47758d517118e0a9e897ee",
+        "android_client_info": {
+          "package_name": "com.example.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYLKIGK_T1il6ZLUVGUXip8IMfrVJCOgQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:691735027883:android:ff9699e28802ed93e897ee",
+        "android_client_info": {
+          "package_name": "com.university.appointments"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYLKIGK_T1il6ZLUVGUXip8IMfrVJCOgQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
