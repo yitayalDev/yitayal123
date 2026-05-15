@@ -12,8 +12,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve Static Files from Flutter Web Build
-app.use(express.static(path.join(__dirname, '../frontend/build/web')));
+// Serve Static Files from Flutter Web Build (Inside Backend)
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -32,8 +32,8 @@ initReminderJob();
 
 
 // Catch-all: serve Flutter Web index.html for any other requests
-app.use((req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/build/web/index.html'));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Database Connection
