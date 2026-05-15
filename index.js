@@ -31,8 +31,8 @@ initReminderJob();
 
 
 
-// Catch-all: serve Flutter Web index.html for any other requests
-app.get('/:match*', (req, res) => {
+// Catch-all: serve Flutter Web index.html for any other requests (No wildcard needed)
+app.use((req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
