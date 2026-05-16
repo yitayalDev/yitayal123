@@ -1,6 +1,6 @@
 class ApiConfig {
   // Change this to your current ngrok URL or your local IP (e.g., http://10.0.2.2:5000)
-  static const String baseUrl = "https://region-preformed-unseated.ngrok-free.dev/api";
+  static const String baseUrl = "https://university-appointment-backend.onrender.com/api";
   
   static String get authUrl => "$baseUrl/auth";
   static String get servicesUrl => "$baseUrl/services";
@@ -13,7 +13,6 @@ class ApiConfig {
     return {
       'Content-Type': 'application/json',
       'x-auth-token': token ?? '',
-      'ngrok-skip-browser-warning': '69420', // Bypasses ngrok warning page
     };
   }
 }

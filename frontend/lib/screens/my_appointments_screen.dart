@@ -6,8 +6,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:jitsi_meet_flutter_sdk/jitsi_meet_flutter_sdk.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:js' as js;
 import '../models/appointment_model.dart';
 import '../services/appointment_service.dart';
 import '../widgets/rating_dialog.dart';
@@ -43,9 +41,13 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
     }
 
     if (kIsWeb) {
-      final url = 'https://meet.jit.si/${appointment.meetingRoom}';
+      final url = Uri.parse('https://meet.jit.si/${appointment.meetingRoom}');
       try {
-        js.context.callMethod('open', [url, '_blank']);
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        } else {
+          throw 'Could not launch $url';
+        }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Could not launch video call: $e')),
