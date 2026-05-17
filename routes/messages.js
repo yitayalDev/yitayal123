@@ -45,7 +45,7 @@ router.post('/', auth, async (req, res) => {
         res.json(message);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server Error');
+        res.status(500).json({ msg: 'Server error', error: err.message });
     }
 });
 
@@ -72,7 +72,7 @@ router.get('/:appointmentId', auth, async (req, res) => {
         res.json(messages);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server Error');
+        res.status(500).json({ msg: 'Server error', error: err.message });
     }
 });
 
