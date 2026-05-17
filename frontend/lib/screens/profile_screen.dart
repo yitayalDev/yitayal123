@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/language_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -17,10 +18,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _saveLastRoute();
     final user = Provider.of<AuthProvider>(context, listen: false).user;
     _nameController = TextEditingController(text: user?.name ?? "");
     _phoneController = TextEditingController(text: user?.phone ?? "");
     _bioController = TextEditingController(text: user?.bio ?? "");
+  }
+
+  void _saveLastRoute() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_route', 'profile');
+    } catch (e) {
+      print("Error saving last route: $e");
+    }
   }
 
   @override

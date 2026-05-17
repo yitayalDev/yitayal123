@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/notification_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationsScreen extends StatefulWidget {
   @override
@@ -12,8 +13,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
+    _saveLastRoute();
     Future.microtask(() =>
         Provider.of<NotificationProvider>(context, listen: false).fetchNotifications());
+  }
+
+  void _saveLastRoute() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_route', 'notifications');
+    } catch (e) {
+      print("Error saving last route: $e");
+    }
   }
 
   @override

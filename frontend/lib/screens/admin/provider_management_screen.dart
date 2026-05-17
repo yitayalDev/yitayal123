@@ -456,7 +456,7 @@ class _ProviderDetailScreenState extends State<ProviderDetailScreen> {
 
       // Fetch all appointments and filter for this provider
       final response = await http.get(
-        Uri.parse("${ApiConfig.baseUrl}/api/appointments/my"),
+        Uri.parse(ApiConfig.appointmentsUrl + "/my"),
         headers: {'x-auth-token': token ?? ''},
       );
 

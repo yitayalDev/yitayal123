@@ -12,7 +12,7 @@ class ChatService {
       String? token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('$baseUrl/api/messages/$appointmentId'),
+        Uri.parse('$baseUrl/messages/$appointmentId'),
         headers: {'x-auth-token': token ?? ''},
       );
 
@@ -32,7 +32,7 @@ class ChatService {
       String? token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse('$baseUrl/api/messages'),
+        Uri.parse('$baseUrl/messages'),
         headers: {
           'Content-Type': 'application/json',
           'x-auth-token': token ?? ''

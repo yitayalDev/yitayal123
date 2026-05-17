@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,9 +31,17 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _loadMyId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _myId = prefs.getString('userId');
-    });
+    final userStr = prefs.getString('user');
+    if (userStr != null) {
+      try {
+        final userMap = jsonDecode(userStr);
+        setState(() {
+          _myId = userMap['id'] ?? userMap['_id'];
+        });
+      } catch (e) {
+        print('Error decoding user: $e');
+      }
+    }
   }
 
   Future<void> _fetchMessages() async {
@@ -65,6 +74,14 @@ class _ChatScreenState extends State<ChatScreen> {
     final success = await _chatService.sendMessage(widget.appointmentId, text);
     if (success) {
       _fetchMessages();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to send message. Please check connection.'),
+          backgroundColor: Colors.red[700],
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -115,7 +132,14 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
                     final msg = _messages[index];
-                    final isMe = msg['senderId']['_id'] == _myId;
+                    final sender = msg['senderId'];
+                    String senderId = '';
+                    if (sender is Map) {
+                      senderId = sender['_id'] ?? '';
+                    } else if (sender != null) {
+                      senderId = sender.toString();
+                    }
+                    final isMe = senderId == _myId;
                     return _buildMessageBubble(msg, isMe);
                   },
                 ),
@@ -152,7 +176,9 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             SizedBox(height: 4),
             Text(
-              DateFormat('hh:mm a').format(DateTime.parse(msg['createdAt'])),
+              msg['createdAt'] != null 
+                  ? DateFormat('hh:mm a').format(DateTime.parse(msg['createdAt']).toLocal()) 
+                  : '',
               style: TextStyle(color: isMe ? Colors.white70 : Color(0xFF94A3B8), fontSize: 9),
             ),
           ],

@@ -46,6 +46,51 @@ class _ManageServicesScreenState extends State<ManageServicesScreen> {
     }
   }
 
+  Future<void> _deleteService(String id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete Service?'),
+        content: Text('Are you sure you want to permanently delete this service and all of its booked appointments?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true), 
+            child: Text('Delete', style: TextStyle(color: Colors.red))
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String? token = prefs.getString('token');
+
+        final response = await http.delete(
+          Uri.parse('$baseUrl/$id'),
+          headers: ApiConfig.getHeaders(token),
+        );
+
+        if (response.statusCode == 200) {
+          _fetchServices();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Service and associated appointments deleted successfully!'),
+              backgroundColor: Colors.red[700],
+              behavior: SnackBarBehavior.floating,
+            )
+          );
+        } else {
+          final err = jsonDecode(response.body);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err['msg'] ?? 'Delete failed')));
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
   void _showServiceDialog({ServiceModel? service}) {
     final _nameController = TextEditingController(text: service?.name ?? '');
     final _descController = TextEditingController(text: service?.description ?? '');
@@ -220,16 +265,33 @@ class _ManageServicesScreenState extends State<ManageServicesScreen> {
                                 style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w500, fontSize: 13),
                               ),
                             ),
-                            trailing: IconButton(
-                              icon: Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.1),
-                                  shape: BoxShape.circle,
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue.withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(Icons.edit_rounded, color: Colors.blue[700], size: 20),
+                                  ),
+                                  onPressed: () => _showServiceDialog(service: service),
                                 ),
-                                child: Icon(Icons.edit_rounded, color: Colors.blue[700], size: 20),
-                              ),
-                              onPressed: () => _showServiceDialog(service: service),
+                                SizedBox(width: 8),
+                                IconButton(
+                                  icon: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(Icons.delete_outline_rounded, color: Colors.red[700], size: 20),
+                                  ),
+                                  onPressed: () => _deleteService(service.id),
+                                ),
+                              ],
                             ),
                           ),
                         );

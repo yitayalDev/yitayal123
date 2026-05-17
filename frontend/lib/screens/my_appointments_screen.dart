@@ -1,4 +1,5 @@
 import 'dart:io' show File;
+import '../services/launcher_helper.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +11,7 @@ import '../models/appointment_model.dart';
 import '../services/appointment_service.dart';
 import '../widgets/rating_dialog.dart';
 import 'chat_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyAppointmentsScreen extends StatefulWidget {
   @override
@@ -23,7 +25,17 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
   @override
   void initState() {
     super.initState();
+    _saveLastRoute();
     _refreshAppointments();
+  }
+
+  void _saveLastRoute() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_route', 'my_appointments');
+    } catch (e) {
+      print("Error saving last route: $e");
+    }
   }
 
   void _refreshAppointments() {
@@ -41,13 +53,9 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
     }
 
     if (kIsWeb) {
-      final url = Uri.parse('https://meet.jit.si/${appointment.meetingRoom}');
+      final url = 'https://meet.jit.si/${appointment.meetingRoom}';
       try {
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url, mode: LaunchMode.externalApplication);
-        } else {
-          throw 'Could not launch $url';
-        }
+        openWebUrl(url);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Could not launch video call: $e')),
@@ -56,25 +64,35 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
       return;
     }
 
-    var jitsiMeet = JitsiMeet();
-    var options = JitsiMeetConferenceOptions(
-      room: appointment.meetingRoom!,
-      configOverrides: {
-        "startWithAudioMuted": true,
-        "startWithVideoMuted": true,
-        "subject" : appointment.serviceName,
-      },
-      featureFlags: {
-        "unsecureMeetingIdReminder": false,
-        "ios.screensharing.enabled": false,
-      },
-      userInfo: JitsiMeetUserInfo(
-          displayName: appointment.userName ?? "Student",
-          email: "",
-          avatar: ""
-      ),
-    );
-    await jitsiMeet.join(options);
+    try {
+      var jitsiMeet = JitsiMeet();
+      var options = JitsiMeetConferenceOptions(
+        room: appointment.meetingRoom!,
+        configOverrides: {
+          "startWithAudioMuted": true,
+          "startWithVideoMuted": true,
+          "subject" : appointment.serviceName,
+        },
+        featureFlags: {
+          "unsecureMeetingIdReminder": false,
+          "ios.screensharing.enabled": false,
+        },
+        userInfo: JitsiMeetUserInfo(
+            displayName: appointment.userName ?? "Student",
+            email: "",
+            avatar: ""
+        ),
+      );
+      await jitsiMeet.join(options);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error launching Jitsi call: $e'),
+          backgroundColor: Colors.red[700],
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   Color _getStatusColor(String status) {
@@ -144,11 +162,11 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
   }
 
   void _pickAndUpload(String appointmentId) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'png'],
-      withData: kIsWeb,
-    );
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        withData: kIsWeb,
+      );
 
     if (result != null) {
       dynamic fileToUpload;
@@ -181,6 +199,15 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
         );
         _refreshAppointments();
       }
+    }
+    } catch (e) {
+      print("File picking error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not open file picker: $e'),
+          backgroundColor: Colors.red[700],
+        ),
+      );
     }
   }
 
@@ -333,7 +360,9 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
               icon: Icon(Icons.open_in_new_rounded, size: 16, color: Color(0xFF1E3C72)),
               onPressed: () async {
                 final url = _appointmentService.getAttachmentUrl(file);
-                if (await canLaunchUrl(Uri.parse(url))) {
+                if (kIsWeb) {
+                  openWebUrl(url);
+                } else if (await canLaunchUrl(Uri.parse(url))) {
                   await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                 }
               },
