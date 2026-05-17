@@ -68,12 +68,23 @@ router.get('/users', [auth, checkRole(['admin'])], async (req, res) => {
 });
 
 // @route   DELETE api/admin/users/:id
-// @desc    Delete a user
+// @desc    Delete a user (cascading delete if provider)
 // @access  Private (Admin)
 router.delete('/users/:id', [auth, checkRole(['admin'])], async (req, res) => {
     try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        // If the user being deleted is a provider, perform cascading deletes
+        if (user.role === 'provider') {
+            await Service.deleteMany({ providerId: req.params.id });
+            await Appointment.deleteMany({ providerId: req.params.id });
+        }
+
         await User.findByIdAndDelete(req.params.id);
-        res.json({ msg: 'User removed' });
+        res.json({ msg: 'User and all associated data removed successfully' });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
