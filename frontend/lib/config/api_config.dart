@@ -1,6 +1,18 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 class ApiConfig {
-  // Change this to your current ngrok URL or your local IP (e.g., http://10.0.2.2:5000)
-  static const String baseUrl = "https://university-appointment-backend.onrender.com/api";
+  // Dynamically detect active host on web (localhost or Render) to make testing seamless
+  static String get baseUrl {
+    if (kIsWeb) {
+      final origin = Uri.base.origin;
+      // Handles cases where hot reload or stubs return empty origin
+      if (origin.isNotEmpty && origin.startsWith('http')) {
+        return "$origin/api";
+      }
+    }
+    // Mobile or absolute fallback
+    return "https://university-appointment-backend.onrender.com/api";
+  }
   
   static String get authUrl => "$baseUrl/auth";
   static String get servicesUrl => "$baseUrl/services";
@@ -16,3 +28,4 @@ class ApiConfig {
     };
   }
 }
+
