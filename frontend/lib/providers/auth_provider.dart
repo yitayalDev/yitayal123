@@ -7,12 +7,15 @@ class AuthProvider with ChangeNotifier {
   UserModel? _user;
   bool _isLoading = false;
   bool _isGuest = false;
+  String? _demoRole;
   final AuthService _authService = AuthService();
 
   UserModel? get user => _user;
   bool get isLoading => _isLoading;
-  bool get isAuthenticated => _user != null || _isGuest;
+  bool get isAuthenticated => _user != null || _isGuest || _demoRole != null;
   bool get isGuest => _isGuest;
+  bool get isDemo => _demoRole != null;
+  String? get demoRole => _demoRole;
 
   AuthProvider() {
     _loadUser();
@@ -26,6 +29,20 @@ class AuthProvider with ChangeNotifier {
   void loginAsGuest() {
     _isGuest = true;
     _user = null;
+    _demoRole = null;
+    notifyListeners();
+  }
+
+  void loginAsDemo(String role) {
+    _isGuest = false;
+    _demoRole = role;
+    _user = UserModel(
+      id: 'demo_user',
+      name: 'Demo ${role[0].toUpperCase()}${role.substring(1)}',
+      email: 'demo@university.edu',
+      role: role,
+      category: role == 'provider' ? 'Information Technology' : 'General',
+    );
     notifyListeners();
   }
 
@@ -38,6 +55,7 @@ class AuthProvider with ChangeNotifier {
     if (result['success']) {
       _user = result['user'];
       _isGuest = false;
+      _demoRole = null;
       _syncFcmToken();
     }
 
@@ -55,6 +73,7 @@ class AuthProvider with ChangeNotifier {
     if (result['success']) {
       _user = result['user'];
       _isGuest = false;
+      _demoRole = null;
       _syncFcmToken();
     }
 
@@ -66,6 +85,8 @@ class AuthProvider with ChangeNotifier {
   Future<void> logout() async {
     _user = null;
     _isGuest = false;
+    _demoRole = null;
+    await _authService.logout();
     notifyListeners();
   }
 

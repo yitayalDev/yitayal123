@@ -357,6 +357,26 @@ router.patch('/:id/status', [auth, checkRole(['provider', 'admin'])], async (req
     }
 });
 
+// @route   DELETE api/appointments/:id
+// @desc    Permanently delete an appointment
+// @access  Private (Provider/Admin)
+router.delete('/:id', [auth, checkRole(['provider', 'admin'])], async (req, res) => {
+    try {
+        let appointment = await Appointment.findById(req.params.id);
+        if (!appointment) return res.status(404).json({ msg: 'Appointment not found' });
+
+        if (appointment.providerId.toString() !== req.user.id && req.user.role !== 'admin') {
+            return res.status(401).json({ msg: 'User not authorized' });
+        }
+
+        await Appointment.findByIdAndDelete(req.params.id);
+        res.json({ msg: 'Appointment permanently deleted' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 // @route   POST api/appointments/emergency-cancel
 // @desc    Toggle provider availability and cancel today's appointments
 // @access  Private (Provider)

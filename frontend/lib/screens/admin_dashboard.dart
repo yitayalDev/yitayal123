@@ -30,6 +30,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Future<void> _fetchStats() async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    if (auth.isDemo) {
+      await Future.delayed(Duration(milliseconds: 500));
+      setState(() {
+        _stats = {
+          'users': 245,
+          'providers': 18,
+          'appointments': 1240,
+          'statusBreakdown': {
+            'pending': 15,
+            'approved': 85,
+            'rejected': 10
+          }
+        };
+        _isLoading = false;
+      });
+      return;
+    }
+
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('token');

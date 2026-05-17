@@ -66,7 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.user;
 
-    if (authProvider.isGuest) {
+    if (authProvider.isGuest && !authProvider.isDemo) {
       return UserDashboard(); // Guests use the same discovery dashboard as students
     }
 
@@ -74,12 +74,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    // Role-based routing (works for both real and demo users)
     switch (user.role) {
       case 'admin':
         return AdminDashboard();
       case 'provider':
         return ProviderDashboard();
       case 'user':
+      case 'student':
       default:
         return UserDashboard();
     }

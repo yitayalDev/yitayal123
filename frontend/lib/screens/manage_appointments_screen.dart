@@ -90,6 +90,24 @@ class _ManageAppointmentsScreenState extends State<ManageAppointmentsScreen> {
     }
   }
 
+  void _deleteAppointment(String id) async {
+    final result = await _appointmentService.deleteAppointment(id);
+    if (result['success']) {
+      _refreshAppointments();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Appointment permanently deleted'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red[700],
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? 'Failed to delete')),
+      );
+    }
+  }
+
   void _showReasonDialog(String id, String status) {
     final controller = TextEditingController();
     showDialog(
@@ -479,6 +497,38 @@ class _ManageAppointmentsScreenState extends State<ManageAppointmentsScreen> {
                                   tooltip: 'Chat with Student',
                                 ),
                               ],
+                            ],
+                          ),
+                        ],
+                        if (appointment.status == 'rejected' || appointment.status == 'cancelled' || appointment.status == 'completed') ...[
+                          SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: Text('Delete Appointment?'),
+                                      content: Text('Are you sure you want to permanently erase this ${appointment.status} appointment from your history?'),
+                                      actions: [
+                                        TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            _deleteAppointment(appointment.id);
+                                          },
+                                          child: Text('Delete', style: TextStyle(color: Colors.red)),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                icon: Icon(Icons.delete_outline_rounded, size: 20),
+                                label: Text('Delete Record'),
+                                style: TextButton.styleFrom(foregroundColor: Colors.red[700]),
+                              ),
                             ],
                           ),
                         ],

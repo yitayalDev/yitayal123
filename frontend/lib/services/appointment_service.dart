@@ -186,4 +186,26 @@ class AppointmentService {
       return {'success': false, 'message': 'Connection error: $e'};
     }
   }
+
+  Future<Map<String, dynamic>> deleteAppointment(String appointmentId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+
+      final response = await http.delete(
+        Uri.parse('$baseUrl/$appointmentId'),
+        headers: ApiConfig.getHeaders(token),
+      );
+
+      final responseData = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {'success': true};
+      } else {
+        return {'success': false, 'message': responseData['msg'] ?? 'Server error ${response.statusCode}'};
+      }
+    } catch (e) {
+      print('Delete Error: $e');
+      return {'success': false, 'message': 'Connection error: $e'};
+    }
+  }
 }

@@ -31,6 +31,69 @@ class _UserDashboardState extends State<UserDashboard> {
   }
 
   Future<void> _loadServices() async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    if (auth.isDemo) {
+      // Mock data for demo mode
+      await Future.delayed(Duration(milliseconds: 500));
+      setState(() {
+        _allServices = [
+          ServiceModel(
+            id: '1',
+            name: 'Academic Records Request',
+            providerId: 'p1',
+            providerName: 'Registrar Office',
+            providerCategory: 'Administration',
+            duration: 15,
+            providerIsAvailable: true,
+            category: 'Records',
+          ),
+          ServiceModel(
+            id: '2',
+            name: 'Course Registration Help',
+            providerId: 'p1',
+            providerName: 'Registrar Office',
+            providerCategory: 'Administration',
+            duration: 20,
+            providerIsAvailable: true,
+            category: 'Academic',
+          ),
+          ServiceModel(
+            id: '3',
+            name: 'Software Installation',
+            providerId: 'p2',
+            providerName: 'IT Support Center',
+            providerCategory: 'Technical Support',
+            duration: 30,
+            providerIsAvailable: true,
+            category: 'IT',
+          ),
+          ServiceModel(
+            id: '4',
+            name: 'Network Connection Issue',
+            providerId: 'p2',
+            providerName: 'IT Support Center',
+            providerCategory: 'Technical Support',
+            duration: 15,
+            providerIsAvailable: false,
+            category: 'IT',
+          ),
+          ServiceModel(
+            id: '5',
+            name: 'General Health Checkup',
+            providerId: 'p3',
+            providerName: 'University Health Clinic',
+            providerCategory: 'Healthcare',
+            duration: 20,
+            providerIsAvailable: true,
+            category: 'Health',
+          ),
+        ];
+        _filteredServices = _allServices;
+        _isLoading = false;
+      });
+      return;
+    }
+
     try {
       final services = await _serviceService.getServices();
       setState(() {

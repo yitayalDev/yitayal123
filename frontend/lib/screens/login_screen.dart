@@ -126,7 +126,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 20),
+                  Text(
+                    '--- OR TRY DEMO MODE ---',
+                    style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                  ),
+                  SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildDemoButton(context, 'Student', Icons.person_outline, Colors.blue),
+                      SizedBox(width: 10),
+                      _buildDemoButton(context, 'Provider', Icons.medical_services_outlined, Colors.orange),
+                      SizedBox(width: 10),
+                      _buildDemoButton(context, 'Admin', Icons.admin_panel_settings_outlined, Colors.redAccent),
+                    ],
+                  ),
+                  SizedBox(height: 20),
                   TextButton(
                     onPressed: () => Navigator.pushNamed(context, '/register'),
                     child: Text(
@@ -142,6 +158,34 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDemoButton(BuildContext context, String label, IconData icon, Color color) {
+    return InkWell(
+      onTap: () {
+        final role = label.toLowerCase();
+        Provider.of<AuthProvider>(context, listen: false).loginAsDemo(role);
+        Navigator.pushReplacementNamed(context, '/');
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white10),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.white, size: 20),
+            SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );

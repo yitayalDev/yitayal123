@@ -34,6 +34,16 @@ class _ProviderDashboardState extends State<ProviderDashboard> {
   }
 
   Future<void> _fetchStats() async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    if (auth.isDemo) {
+      await Future.delayed(Duration(milliseconds: 500));
+      setState(() {
+        _stats = {'pending': 5, 'approved': 12};
+        _isLoading = false;
+      });
+      return;
+    }
+
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('token');
