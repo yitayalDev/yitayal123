@@ -103929,7 +103929,7 @@ return s},
 $S:626}
 A.Ve.prototype={
 F(a){var s=null,r=A.Ak(s,s,"Roboto",B.hy,s,A.b0J(A.aY()))
-return new A.FX(A.aa(["/",new A.aoT(),"/login",new A.aoU(),"/register",new A.aoV()],t.N,t.Ab),"/","University Appointment App",r,!1,s)}}
+return new A.FX(A.aa(["/",new A.aoT(),"/login",new A.aoU(),"/register",new A.aoV()],t.N,t.Ab),"/","Campus Appointment",r,!1,s)}}
 A.aoT.prototype={
 $1(a){return A.ae9(new A.aoS(),t.d)},
 $S:627}
