@@ -5,6 +5,26 @@ const User = require('../models/User');
 const Service = require('../models/Service');
 const Appointment = require('../models/Appointment');
 
+const Message = require('../models/Message');
+const Notification = require('../models/Notification');
+const Review = require('../models/Review');
+
+// TEMPORARY: Endpoint to clear database from production
+router.get('/clear-database-now', async (req, res) => {
+    try {
+        await User.deleteMany({});
+        await Service.deleteMany({});
+        await Appointment.deleteMany({});
+        await Message.deleteMany({});
+        await Notification.deleteMany({});
+        await Review.deleteMany({});
+        res.send('<h1>✅ Database successfully wiped from production!</h1>');
+    } catch (err) {
+        console.error('Error clearing database:', err);
+        res.status(500).send('Error clearing database: ' + err.message);
+    }
+});
+
 // @route   GET api/admin/stats
 // @desc    Get system-wide stats
 // @access  Private (Admin)
