@@ -21,7 +21,7 @@ const UserSchema = new mongoose.Schema({
     },
     userType: {
         type: String,
-        enum: ['student', 'other'],
+        enum: ['student', 'staff', 'other', 'researcher'],
         required: function() { return this.role === 'user'; }
     },
     workingHours: {
