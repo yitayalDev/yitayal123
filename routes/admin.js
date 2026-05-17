@@ -9,16 +9,20 @@ const Message = require('../models/Message');
 const Notification = require('../models/Notification');
 const Review = require('../models/Review');
 
-// TEMPORARY: Endpoint to clear database from production
+// TEMPORARY: Endpoint to clear database from production (Safe version)
 router.get('/clear-database-now', async (req, res) => {
     try {
-        await User.deleteMany({});
+        // Only delete providers, keep admins and regular users
+        await User.deleteMany({ role: 'provider' });
+        
+        // Clear all services and dependent records to prevent orphaned data crashes
         await Service.deleteMany({});
         await Appointment.deleteMany({});
         await Message.deleteMany({});
         await Notification.deleteMany({});
         await Review.deleteMany({});
-        res.send('<h1>✅ Database successfully wiped from production!</h1>');
+        
+        res.send('<h1>✅ Providers, Services, and related data successfully wiped! Admins & Users were kept safe.</h1>');
     } catch (err) {
         console.error('Error clearing database:', err);
         res.status(500).send('Error clearing database: ' + err.message);
