@@ -47,7 +47,7 @@ router.post('/register', async (req, res) => {
         );
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server error');
+        res.status(500).json({ msg: 'Server error', error: err.message });
     }
 });
 
@@ -86,7 +86,7 @@ router.post('/login', async (req, res) => {
         );
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server error');
+        res.status(500).json({ msg: 'Server error', error: err.message });
     }
 });
 
@@ -109,7 +109,7 @@ router.put('/profile', require('../middleware/auth').auth, async (req, res) => {
         res.json(user);
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server error');
+        res.status(500).json({ msg: 'Server error', error: err.message });
     }
 });
 
@@ -127,7 +127,7 @@ router.put('/fcm-token', require('../middleware/auth').auth, async (req, res) =>
         res.json({ msg: 'FCM token updated' });
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server error');
+        res.status(500).json({ msg: 'Server error', error: err.message });
     }
 });
 
@@ -142,7 +142,7 @@ router.get('/user/:id', async (req, res) => {
     } catch (err) {
         console.error(err.message);
         if (err.kind === 'ObjectId') return res.status(404).json({ msg: 'User not found' });
-        res.status(500).send('Server error');
+        res.status(500).json({ msg: 'Server error', error: err.message });
     }
 });
 
