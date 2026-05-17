@@ -26,7 +26,7 @@ class ChatService {
     }
   }
 
-  Future<bool> sendMessage(String appointmentId, String text) async {
+  Future<Map<String, dynamic>> sendMessage(String appointmentId, String text) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('token');
@@ -43,10 +43,25 @@ class ChatService {
         }),
       );
 
-      return response.statusCode == 200;
+      if (response.statusCode == 200) {
+        return {'success': true};
+      } else {
+        try {
+          final errorData = jsonDecode(response.body);
+          return {
+            'success': false,
+            'message': errorData['msg'] ?? errorData['error'] ?? 'Server error'
+          };
+        } catch (_) {
+          return {
+            'success': false,
+            'message': 'Server error: ${response.statusCode}'
+          };
+        }
+      }
     } catch (e) {
       print('Send Message Error: $e');
-      return false;
+      return {'success': false, 'message': 'Connection error: $e'};
     }
   }
 }

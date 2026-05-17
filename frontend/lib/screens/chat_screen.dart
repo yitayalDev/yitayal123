@@ -71,13 +71,13 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _controller.text.trim();
     _controller.clear();
 
-    final success = await _chatService.sendMessage(widget.appointmentId, text);
-    if (success) {
+    final result = await _chatService.sendMessage(widget.appointmentId, text);
+    if (result['success'] == true) {
       _fetchMessages();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to send message. Please check connection.'),
+          content: Text(result['message'] ?? 'Failed to send message. Please check connection.'),
           backgroundColor: Colors.red[700],
           behavior: SnackBarBehavior.floating,
         ),
